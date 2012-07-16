@@ -1,0 +1,5 @@
+D:\Svn\Intellivision\Dev\Source\Intellivision\bin\Debug\Intellivision.exe
+D:\Svn\Intellivision\Dev\Source\Intellivision\bin\Debug\Intellivision.pdb
+D:\Svn\Intellivision\Dev\Source\Intellivision\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Svn\Intellivision\Dev\Source\Intellivision\obj\x86\Debug\Intellivision.exe
+D:\Svn\Intellivision\Dev\Source\Intellivision\obj\x86\Debug\Intellivision.pdb
