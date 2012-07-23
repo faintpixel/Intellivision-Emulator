@@ -7,3 +7,12 @@ D:\Svn\Intellivision\Dev\Source\Intellivision.Tests\bin\Debug\nunit.framework.xm
 D:\Svn\Intellivision\Dev\Source\Intellivision.Tests\obj\Debug\ResolveAssemblyReference.cache
 D:\Svn\Intellivision\Dev\Source\Intellivision.Tests\obj\Debug\Intellivision.Tests.dll
 D:\Svn\Intellivision\Dev\Source\Intellivision.Tests\obj\Debug\Intellivision.Tests.pdb
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\Intellivision.Tests.dll
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\Intellivision.Tests.pdb
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\Intellivision.exe
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\nunit.framework.dll
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\Intellivision.pdb
+D:\github\intellivision\Dev\Source\Intellivision.Tests\bin\Debug\nunit.framework.xml
+D:\github\intellivision\Dev\Source\Intellivision.Tests\obj\Debug\ResolveAssemblyReference.cache
+D:\github\intellivision\Dev\Source\Intellivision.Tests\obj\Debug\Intellivision.Tests.dll
+D:\github\intellivision\Dev\Source\Intellivision.Tests\obj\Debug\Intellivision.Tests.pdb

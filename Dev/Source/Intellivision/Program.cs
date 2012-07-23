@@ -28,7 +28,7 @@ namespace Intellivision
 
             // load from file
 
-            BinaryReader reader = new BinaryReader(File.Open("test.rom", FileMode.Open));
+            BinaryReader reader = new BinaryReader(File.Open("hi.bin", FileMode.Open));
             int pos = 0;
             UInt16 index = 0x200;
 
@@ -37,7 +37,12 @@ namespace Intellivision
             {
                 while (pos < length)
                 {
-                    UInt16 data = reader.ReadUInt16();
+                    byte[] word = reader.ReadBytes(2);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(word);
+
+                    UInt16 data = BitConverter.ToUInt16(word, 0);
+                    //UInt16 data = reader.ReadUInt16();
                     Console.Write(data.ToString("X") + ":");
                     memory.Write16BitsToAddress(index, data);
                     pos += sizeof(UInt16);
