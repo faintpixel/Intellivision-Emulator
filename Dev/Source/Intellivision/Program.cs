@@ -19,7 +19,7 @@ namespace Intellivision
             cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
 
             // set the start position
-            cpu.Registers[7] = 0x200;
+            cpu.Registers[7] = 0x1000;
 
             // load an imaginary program into memory
             //memory.Write16BitsToAddress(0x200, 0x0240);  // MVO R0 23
@@ -28,9 +28,9 @@ namespace Intellivision
 
             // load from file
 
-            BinaryReader reader = new BinaryReader(File.Open("hi.bin", FileMode.Open));
+            BinaryReader reader = new BinaryReader(File.Open("system.bin", FileMode.Open));
             int pos = 0;
-            UInt16 index = 0x200;
+            UInt16 index = 0x1000;
 
             int length = (int)reader.BaseStream.Length;
             try
@@ -52,7 +52,10 @@ namespace Intellivision
             catch (Exception ex)
             {
             }
-             
+
+            Console.WriteLine("\n");
+            Console.WriteLine("Rom loaded. Beginning execution.");
+            Console.WriteLine();
 
             // execute
             while (_programRunning)
@@ -71,6 +74,9 @@ namespace Intellivision
                     Console.ReadLine();
                 }
             }
+
+            Console.WriteLine("------------REGISTER VALUES-------------");
+            cpu.DEBUG_PRINT_REGISTERS_AS_INT();
 
             Console.Write("Done.");
             Console.ReadLine();

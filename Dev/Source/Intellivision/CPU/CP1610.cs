@@ -91,7 +91,20 @@ namespace Intellivision.CPU
             }
             else if (command == 0x0004)
             {
-                throw new NotImplementedException("Jump not implemented");
+                Registers[7] += 1;
+                UInt16 command2 = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 register = GetNumberFromBits(command2, 8, 2);
+                UInt16 interuptFlags = GetNumberFromBits(command2, 0, 2);
+                UInt16 addressPart1 = GetNumberFromBits(command2, 2, 6);
+
+                Registers[7] += 1;
+                UInt16 command3 = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 addressPart2 = GetNumberFromBits(command3, 0, 10);
+
+                UInt16 address = (UInt16)((addressPart1 << 10) + addressPart2); 
+
+                Log("JUMP R" + register + ", 0x" + interuptFlags.ToString("x") + ", 0x" + address.ToString("x"), LogType.CommandExecution);
+                Jump_JUMP(register, interuptFlags, address);
             }
             else if (command == 0x0005)
             {
@@ -206,6 +219,13 @@ namespace Intellivision.CPU
                 UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
                 Log("SARC R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftArtithmeticRightThroughCarry_SARC(shiftAmount, register);
+            }
+            else if (command >= 0x0080 && command <= 0x00BF)
+            {
+                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                Log("MOVR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
+                MoveRegister_MOVR(sourceRegister, destinationRegister); 
             }
             else if (command >= 0x00C0 && command <= 0x00FF)
             {
@@ -426,6 +446,13 @@ namespace Intellivision.CPU
             Console.WriteLine();
         }
 
+        public void DEBUG_PRINT_REGISTERS_AS_INT()
+        {
+            for (int i = 0; i < Registers.Length; i++)
+                Console.Write(i + ": " + Registers[i].ToString() + " ");
+            Console.WriteLine();
+        }
+
         public void DEBUG_PRINT_FLAGS()
         {
             Flags.DEBUG_PRINT();
@@ -514,7 +541,7 @@ namespace Intellivision.CPU
             result[4] = Flags.Carry;
 
             Registers[registerNumber] = ConvertBitArrayToUInt16(result);
-        }
+        }             
 
         public void ReturnStatusWord_RSWD(int registerNumber)
         {
@@ -1031,6 +1058,28 @@ namespace Intellivision.CPU
 
         #endregion
 
+        #region Other Functions
+
+        public void Jump_JUMP(int returnAddressRegister, int interuptFlag, UInt16 address)
+        {
+            if (returnAddressRegister != null)
+                Registers[returnAddressRegister] = Registers[7]; // this should be the address right after the jump instruction
+            
+            // do some stuff with the interupt
+            //ff    indicates how to affect the Interrupt (I) flag in the CP1610
+            // such that:
+            //     ff == 00    indicates not to affect the Interrupt flag
+            //     ff == 01    indicates to set the Interrupt flag
+            //     ff == 10    indicates to clear the Interrupt flag
+            //     ff == 11    unknown opcode (behavior unknown!!)
+
+            Registers[7] = (ushort)(address - 1); // minus one so the first command at the address will be executed
+
+            // set auto increment registers
+        }
+
+
+        #endregion 
 
         #region Helpers
 
@@ -1042,11 +1091,37 @@ namespace Intellivision.CPU
         }
 
         public BitArray ConvertUInt16ToBitArray(UInt16 value)
-        {
-            BitArray bits = new BitArray(BitConverter.GetBytes(value));
+        {            
+            byte[] bytes = BitConverter.GetBytes(value);
+
+            BitArray bits = new BitArray(bytes);
+
+            //ReverseBitArray(ref bits);
 
             return bits;
         }
+
+        private void DEBUG_PRINT_BIT_ARRAY(BitArray bits)
+        {
+            foreach (bool bit in bits)
+                if (bit == true)
+                    Console.Write("1");
+                else
+                    Console.Write("0");
+        }
+
+        //private void ReverseBitArray(ref BitArray array)
+        //{
+        //    int length = array.Length;
+        //    int mid = (length / 2);
+
+        //    for (int i = 0; i < mid; i++)
+        //    {
+        //        bool bit = array[i];
+        //        array[i] = array[length - i - 1];
+        //        array[length - i - 1] = bit;
+        //    }
+        //}
 
         public UInt16 GetNumberFromBits(UInt16 number, int startIndex, int length)
         {
@@ -1069,6 +1144,8 @@ namespace Intellivision.CPU
         public UInt16 ConvertBitArrayToUInt16(BitArray bitArray)
         {
             Int32[] result = new Int32[1];
+
+            //ReverseBitArray(ref bitArray);
             bitArray.CopyTo(result, 0);
 
             return (UInt16)result[0];
