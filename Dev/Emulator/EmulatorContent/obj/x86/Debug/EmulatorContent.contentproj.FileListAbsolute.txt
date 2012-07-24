@@ -1,0 +1,1 @@
+D:\github\intellivision\Dev\Emulator\EmulatorContent\obj\x86\Debug\ResolveAssemblyReference.cache

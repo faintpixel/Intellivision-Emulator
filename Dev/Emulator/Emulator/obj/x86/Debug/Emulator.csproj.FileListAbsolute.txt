@@ -1,0 +1,9 @@
+D:\github\intellivision\Dev\Emulator\Emulator\bin\x86\Debug\Emulator.exe
+D:\github\intellivision\Dev\Emulator\Emulator\bin\x86\Debug\Emulator.pdb
+D:\github\intellivision\Dev\Emulator\Emulator\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\github\intellivision\Dev\Emulator\Emulator\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\github\intellivision\Dev\Emulator\Emulator\obj\x86\Debug\Emulator.exe
+D:\github\intellivision\Dev\Emulator\Emulator\obj\x86\Debug\Emulator.pdb
+D:\github\intellivision\Dev\Emulator\Emulator\bin\x86\Debug\Content\DebugFont.xnb
+D:\github\intellivision\Dev\Emulator\Emulator\bin\x86\Debug\Intellivision.exe
+D:\github\intellivision\Dev\Emulator\Emulator\bin\x86\Debug\Intellivision.pdb

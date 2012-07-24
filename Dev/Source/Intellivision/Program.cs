@@ -17,6 +17,7 @@ namespace Intellivision
             MemoryMap memory = new MemoryMap();
             CP1610 cpu = new CP1610(ref memory);
             cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
+            cpu.Log += new CP1610.LoggingEvent(cpu_Log);
 
             // set the start position
             cpu.Registers[7] = 0x1000;
@@ -62,9 +63,11 @@ namespace Intellivision
             {
                 try
                 {
+                    cpu.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
                     cpu.ExecuteInstruction();
                     //cpu.DEBUG_PRINT_REGISTERS_AS_HEX();
                     //cpu.DEBUG_PRINT_FLAGS();
+                    Console.Write("> ");
                     Console.ReadLine();
                 }
                 catch (Exception ex)
@@ -80,6 +83,11 @@ namespace Intellivision
 
             Console.Write("Done.");
             Console.ReadLine();
+        }
+
+        static void cpu_Log(string message, LogType type)
+        {
+            Console.WriteLine(message);
         }
 
         static void cpu_Halted_HALT()

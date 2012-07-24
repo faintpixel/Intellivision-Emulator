@@ -15,6 +15,8 @@ namespace Intellivision.Memory
 
         public void Write16BitsToAddress(UInt16 address, UInt16 value)
         {
+            Console.WriteLine("\nWR a=0x" + address.ToString("X") + " v=0x" + value.ToString("X"));
+
             int nothing = 0;
 
             if (address >= 0 && address <= 0x3F)
@@ -37,22 +39,28 @@ namespace Intellivision.Memory
 
         public UInt16 Read16BitsFromAddress(UInt16 address)
         {
+            UInt16 returnValue = 0;
+
             if (address >= 0 && address <= 0x3F)
-                return 0; // STIC REGISTERS
+                returnValue = 0; // STIC REGISTERS
             else if (address >= 0x0100 && address <= 0x01EF)
-                return _scratchpadRAM.Read(address - 0x0100);
+                returnValue = _scratchpadRAM.Read(address - 0x0100);
             else if (address >= 0x01F0 && address <= 0x01FF)
-                return 0; // PSG REGISTERS
+                returnValue = 0; // PSG REGISTERS
             else if (address >= 0x0200 && address <= 0x035F)
-                return _systemRAM.Read(address - 0x0200);
+                returnValue = _systemRAM.Read(address - 0x0200);
             else if (address >= 0x1000 && address <= 0x1FFF)
-                return _executiveROM.Read(address - 0x1000);
+                returnValue = _executiveROM.Read(address - 0x1000);
             else if (address >= 0x3000 && address <= 0x37FF)
-                return 0; // GRAPHICS ROM
+                returnValue = 0; // GRAPHICS ROM
             else if (address >= 0x3800 && address <= 0x39FF)
-                return 0; // GRAPHICS RAM
+                returnValue = 0; // GRAPHICS RAM
             else
-                return UInt16.MaxValue;
+                returnValue = UInt16.MaxValue;
+
+            Console.WriteLine("\nRD a=0x" + address.ToString("X") + " v=0x" + returnValue.ToString("X"));
+
+            return returnValue;
         }
 
         public void Write8BitsToAddress(UInt16 address, UInt16 value)

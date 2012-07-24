@@ -43,6 +43,7 @@ namespace Intellivision.CPU
         public int Cycles = 0;
 
         public delegate void OutputSignalEvent();
+        public delegate void LoggingEvent(string message, LogType type);
         public event OutputSignalEvent BusAcknowledge_BUSAK;
         public event OutputSignalEvent ExternalBranchConditionAddress0_EBCA0;
         public event OutputSignalEvent ExternalBranchConditionAddress1_EBCA1;
@@ -50,6 +51,7 @@ namespace Intellivision.CPU
         public event OutputSignalEvent ExternalBranchConditionAddress3_EBCA3;
         public event OutputSignalEvent TerminateCurrentInterruprt_TCI;
         public event OutputSignalEvent Halted_HALT;
+        public event LoggingEvent Log;
 
         private List<int> _incrementingRegisters;
 
@@ -67,7 +69,9 @@ namespace Intellivision.CPU
             UInt16 commandAddress = Registers[7];
             UInt16 command = _memoryMap.Read16BitsFromAddress(commandAddress);
 
-            Console.WriteLine("Found command 0x" + command.ToString("X")  + " at address 0x" + commandAddress.ToString("X"));
+            //Console.WriteLine("Found command 0x" + command.ToString("X")  + " at address 0x" + commandAddress.ToString("X"));
+
+            Console.Write("0x" + command.ToString("x") + " - ");
 
             if (command == 0x0000)
             {
@@ -291,14 +295,14 @@ namespace Intellivision.CPU
                 Log("MVO R" + register + " \n " + address, LogType.CommandExecution);
                 MoveOut_MVO(register, address);
             }
-            else if (command >= 0x0248 && command <= 0x026F)
+            else if (command >= 0x0248 && command <= 0x0277) // NOTE: the intellivision wiki has the wrong end address for this
             {
                 UInt16 sourceRegister = GetNumberFromBits(command, 0, 3);
                 UInt16 destinationAddressRegister = GetNumberFromBits(command, 3, 3);
-                Log("MVO@ R" + destinationAddressRegister + ", R" + sourceRegister, LogType.CommandExecution);
+                Log("MVO@ R" + sourceRegister + ", R" + destinationAddressRegister, LogType.CommandExecution);
                 MoveOutIndirect_MVOat(sourceRegister, destinationAddressRegister);
             }
-            else if (command >= 0x0270 && command <= 0x027F)
+            else if (command >= 0x0278 && command <= 0x027F) // NOTE: The intellivision wiki has the wrong starting address for this
             {
                 UInt16 register = GetNumberFromBits(command, 0, 3);
                 Log("MVOI R" + register, LogType.CommandExecution);
@@ -436,10 +440,10 @@ namespace Intellivision.CPU
             Registers[7] += 1;
         }
 
-        private void Log(string message, LogType type)
-        {
-            Console.WriteLine(message);
-        }
+        //private void Log(string message, LogType type)
+        //{
+        //    Console.WriteLine(message);
+        //}
 
         #region Debug helpers
 
@@ -499,41 +503,41 @@ namespace Intellivision.CPU
         {
             AllowInterupts = false;
             Flags.Carry = false;
-            Cycles -= 4;
+            Cycles += 4;
         }
 
         public void DisableInterruptSystem_DIS()
         {
             AllowInterupts = false;
             Flags.InterruptEnable = false;
-            Cycles -= 4;
+            Cycles += 4;
         }
 
         public void EnableInterruptSystem_EIS()
         {
             AllowInterupts = false;
             Flags.InterruptEnable = true;
-            Cycles -= 4;
+            Cycles += 4;
         }
 
         public void SetDoubleByteData_SDBD()
         {
             AllowInterupts = false;
             Flags.DoubleByteData = true;
-            Cycles -= 4;
+            Cycles += 4;
         }
 
         public void SetCarry_SETC()
         {
             AllowInterupts = false;
             Flags.Carry = true;
-            Cycles -= 4;
+            Cycles += 4;
         }
 
         public void TerminateCurrentInterrupt_TCI()
         {
             AllowInterupts = false;
-            Cycles -= 4;
+            Cycles += 4;
             if (TerminateCurrentInterruprt_TCI != null)
                 TerminateCurrentInterruprt_TCI();
 
@@ -548,7 +552,7 @@ namespace Intellivision.CPU
             if (registerNumber > 3 || registerNumber < 0)
                 throw new Exception("Invalid register for operation");
 
-            Cycles -= 6;
+            Cycles += 6;
             AllowInterupts = true;
 
             BitArray result = new BitArray(16);
@@ -574,7 +578,7 @@ namespace Intellivision.CPU
                 throw new Exception("Invalid register for operation");
 
             AllowInterupts = true;
-            Cycles -= 6;
+            Cycles += 6;
 
             BitArray registerBits = GetRegisterBits(registerNumber);
             Flags.Sign = registerBits[7];
@@ -594,7 +598,7 @@ namespace Intellivision.CPU
 
             if (doubleSwap)
             {
-                Cycles -= 8;
+                Cycles += 8;
                 
                 for (int i = 0; i < 8; i++)
                     registerBits[i + 8] = registerBits[i];               
@@ -608,7 +612,7 @@ namespace Intellivision.CPU
                     registerBits[i] = overwrittenBit;
                 }
 
-                Cycles -= 6;
+                Cycles += 6;
             }
 
             Flags.Sign = registerBits[7];
@@ -631,9 +635,9 @@ namespace Intellivision.CPU
             AllowInterupts = false;
 
             if (amountToShift == 1)
-                Cycles -= 6;
+                Cycles += 6;
             else
-                Cycles -= 8;
+                Cycles += 8;
 
             Registers[registerNumber] = (UInt16)(Registers[registerNumber] << amountToShift);
 
@@ -651,7 +655,7 @@ namespace Intellivision.CPU
             {
                 newBits[0] = Flags.Carry;
                 Flags.Carry = originalBits[15];                
-                Cycles -= 6;
+                Cycles += 6;
             }
             else
             {
@@ -659,7 +663,7 @@ namespace Intellivision.CPU
                 newBits[1] = Flags.Carry;
                 Flags.Carry = originalBits[15];
                 Flags.Overflow = originalBits[14]; 
-                Cycles -= 8;
+                Cycles += 8;
             }
 
             Registers[registerNumber] = ConvertBitArrayToUInt16(newBits);
@@ -675,11 +679,11 @@ namespace Intellivision.CPU
 
             if (amountToShift == 1)
             {
-                Cycles -= 6;
+                Cycles += 6;
             }
             else
             {
-                Cycles -= 8;
+                Cycles += 8;
                 Flags.Overflow = originalBits[14];
             }
 
@@ -699,9 +703,9 @@ namespace Intellivision.CPU
             AllowInterupts = false;
 
             if (amountToShift == 1)
-                Cycles -= 6;
+                Cycles += 6;
             else
-                Cycles -= 8;
+                Cycles += 8;
 
             Registers[registerNumber] = (UInt16)(Registers[registerNumber] >> amountToShift);
             
@@ -723,12 +727,12 @@ namespace Intellivision.CPU
             {
                 newBits[14] = originalBits[15];
                 Flags.Sign = originalBits[9];
-                Cycles -= 8;
+                Cycles += 8;
             }
             else
             {
                 Flags.Sign = originalBits[8];
-                Cycles -= 6;
+                Cycles += 6;
             }
 
             Registers[registerNumber] = ConvertBitArrayToUInt16(newBits);
@@ -745,10 +749,10 @@ namespace Intellivision.CPU
             BitArray updatedBits = GetRegisterBits(registerNumber);
 
             if (amountToShift == 1)
-                Cycles -= 6;
+                Cycles += 6;
             else
             {
-                Cycles -= 8;
+                Cycles += 8;
                 Flags.Overflow = originalBits[1];
                 updatedBits[14] = originalBits[15];
             }
@@ -774,12 +778,12 @@ namespace Intellivision.CPU
 
             if (amountToRotate == 1)
             {
-                Cycles -= 6;
+                Cycles += 6;
                 updatedBits[15] = Flags.Carry;
             }
             else
             {
-                Cycles -= 8;
+                Cycles += 8;
                 updatedBits[15] = Flags.Overflow;
                 updatedBits[14] = Flags.Carry;
                 Flags.Overflow = originalBits[1];
@@ -794,9 +798,9 @@ namespace Intellivision.CPU
         public void MoveRegister_MOVR(int sourceRegister, int destinationRegister)
         {
             if (destinationRegister == 6 || destinationRegister == 7)
-                Cycles -= 7;
+                Cycles += 7;
             else
-                Cycles -= 6;
+                Cycles += 6;
 
             Registers[destinationRegister] = Registers[sourceRegister];
 
@@ -889,7 +893,7 @@ namespace Intellivision.CPU
 
         public void ComplementRegister_COMR(int registerNumber)
         {
-            Cycles -= 6;
+            Cycles += 6;
 
             BitArray bits = GetRegisterBits(registerNumber);
             for (int i = 0; i < bits.Length; i++)
@@ -1017,6 +1021,8 @@ namespace Intellivision.CPU
 
             if (returnAddressRegister != null)
                 IncrementRegisterForIndirectMode(returnAddressRegister.Value);
+
+            Cycles += 12;
         }
 
         public void MoveInIndirect_MVIat(int destinationRegister, int addressRegister)
@@ -1076,18 +1082,15 @@ namespace Intellivision.CPU
             // Q - For MVO@, assuming that DoubleByteData flag makes it either write 8bits of 16
             // Q - How does MVO@ work with R6? Neither register gets written to, so R6 will never increment?
 
-            //if (sourceRegister == 6)
-            //    Registers[6] -= 1;
+            UInt16 address = Registers[destinationAddressRegister];
+            UInt16 value = Registers[sourceRegister];
 
-            //UInt16 address = Registers[addressRegister];
-            //UInt16 value = Registers[sourceRegister];
+            if (Flags.DoubleByteData)
+                _memoryMap.Write16BitsToAddress(address, value);
+            else
+                _memoryMap.Write16BitsToAddress(address, value); // should be 16
 
-            //if (Flags.DoubleByteData)
-            //    _memoryMap.Write16BitsToAddress(address, value);
-            //else
-            //    _memoryMap.Write8BitsToAddress(address, value);
-
-            //IncrementRegistersForIndirectMode(sourceRegister, addressRegister);    
+            IncrementRegistersForIndirectMode(sourceRegister, destinationAddressRegister);    
         }
 
         public void AddIndirect_ADDat()
@@ -1144,6 +1147,16 @@ namespace Intellivision.CPU
                     Console.Write("1");
                 else
                     Console.Write("0");
+        }
+
+        public void DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO()
+        {
+            for (int i = 0; i <= 7; i++)
+                Console.Write(Registers[i].ToString("x").PadLeft(4, '0') + " ");
+
+            Flags.DEBUG_PRINT();
+
+            Console.Write(" " + Cycles.ToString().PadRight(5, ' ') + " ");
         }
 
         //private void ReverseBitArray(ref BitArray array)

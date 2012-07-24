@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Intellivision.CPU
 {
-    enum LogType
+    public enum LogType
     {
         CommandExecution = 0,
         Warning = 1,
