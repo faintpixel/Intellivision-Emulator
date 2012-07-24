@@ -322,8 +322,16 @@ namespace Intellivision.CPU
             else if (command >= 0x02B0 && command <= 0x02BF)
             {
                 UInt16 register = GetNumberFromBits(command, 0, 3);
-                Log("MVII R" + register, LogType.CommandExecution);
-                throw new NotImplementedException("MVII not implemented");
+                Registers[7] += 1;
+                UInt16 value = _memoryMap.Read16BitsFromAddress(Registers[7]);
+
+                if (Flags.DoubleByteData)
+                    value = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                else
+                    value = _memoryMap.Read16BitsFromAddress(Registers[7]); // FIX - this should be 8 bits i think
+
+                Log("MVII 0x" + value.ToString("x") + ", R" + register, LogType.CommandExecution);
+                MoveInImmediate_MVII(register, value);
             }
             else if (command >= 0x02C0 && command <= 0x02C7)
             {
@@ -997,6 +1005,20 @@ namespace Intellivision.CPU
 
         #region Indirect Addressing Mode Functions
 
+        public void Jump_JUMP(int? returnAddressRegister, bool? interuptFlag, UInt16 address)
+        {
+            if (returnAddressRegister != null)
+                Registers[returnAddressRegister.Value] = Registers[7]; // this should be the address right after the jump instruction
+
+            if (interuptFlag != null)
+                Flags.InterruptEnable = interuptFlag.Value;
+
+            Registers[7] = (ushort)(address - 1); // minus one so the first command at the address will be executed
+
+            if (returnAddressRegister != null)
+                IncrementRegisterForIndirectMode(returnAddressRegister.Value);
+        }
+
         public void MoveInIndirect_MVIat(int destinationRegister, int addressRegister)
         {
             // Q - Does MVI@ set the zero/sign flag like INCR?
@@ -1017,6 +1039,20 @@ namespace Intellivision.CPU
             Registers[destinationRegister] = value;
 
             IncrementRegistersForIndirectMode(destinationRegister, addressRegister);            
+        }
+
+        public void MoveInImmediate_MVII(int destinationRegister, UInt16 value)
+        {
+            // Q - Does MVI@ set the zero/sign flag like INCR?
+            // Q - MVI@ uses 2 registers... if I use R4 for one and R5 for the other, do they both increment?
+            // The answers to the above questions will affect all other indirect methods as well..
+
+            if (destinationRegister == 6)
+                Registers[6] -= 1;
+
+            Registers[destinationRegister] = value;
+
+            IncrementRegisterForIndirectMode(destinationRegister);   
         }
 
         private void IncrementRegistersForIndirectMode(int writeRegister, int readRegister)
@@ -1080,25 +1116,6 @@ namespace Intellivision.CPU
         }
 
         #endregion
-
-        #region Other Functions
-
-        public void Jump_JUMP(int? returnAddressRegister, bool? interuptFlag, UInt16 address)
-        {
-            if (returnAddressRegister != null)
-                Registers[returnAddressRegister.Value] = Registers[7]; // this should be the address right after the jump instruction
-
-            if (interuptFlag != null)
-                Flags.InterruptEnable = interuptFlag.Value;
-
-            Registers[7] = (ushort)(address - 1); // minus one so the first command at the address will be executed
-
-            if(returnAddressRegister != null)
-                IncrementRegisterForIndirectMode(returnAddressRegister.Value);
-        }
-
-
-        #endregion 
 
         #region Helpers
 
