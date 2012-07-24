@@ -93,7 +93,7 @@ namespace Intellivision.CPU
             {
                 Registers[7] += 1;
                 UInt16 command2 = _memoryMap.Read16BitsFromAddress(Registers[7]);
-                UInt16 register = GetNumberFromBits(command2, 8, 2);
+                UInt16 registerId = GetNumberFromBits(command2, 8, 2);
                 UInt16 interuptFlags = GetNumberFromBits(command2, 0, 2);
                 UInt16 addressPart1 = GetNumberFromBits(command2, 2, 6);
 
@@ -101,10 +101,27 @@ namespace Intellivision.CPU
                 UInt16 command3 = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 UInt16 addressPart2 = GetNumberFromBits(command3, 0, 10);
 
-                UInt16 address = (UInt16)((addressPart1 << 10) + addressPart2); 
+                UInt16 address = (UInt16)((addressPart1 << 10) + addressPart2);
+
+                int? register = null;
+
+                if (registerId == 0)
+                    register = 4;
+                else if (registerId == 1)
+                    register = 5;
+                else if (registerId == 2)
+                    registerId = 6;
+
+                bool? interupt = null;
+                if (interuptFlags == 1)
+                    interupt = true;
+                else if (interuptFlags == 2)
+                    interupt = false;
+                //else if (interuptFlags == 3)
+                //    UNDOCUMENTED - it's a mystery!
 
                 Log("JUMP R" + register + ", 0x" + interuptFlags.ToString("x") + ", 0x" + address.ToString("x"), LogType.CommandExecution);
-                Jump_JUMP(register, interuptFlags, address);
+                Jump_JUMP(register, interupt, address);
             }
             else if (command == 0x0005)
             {
@@ -1012,6 +1029,12 @@ namespace Intellivision.CPU
                 Registers[readRegister] += 1;
         }
 
+        private void IncrementRegisterForIndirectMode(int register)
+        {
+            if (_incrementingRegisters.Contains(register))
+                Registers[register] += 1;
+        }
+
         public void MoveOutIndirect_MVOat(int sourceRegister, int destinationAddressRegister)
         {
             // Q - For MVO@, assuming that DoubleByteData flag makes it either write 8bits of 16
@@ -1060,22 +1083,18 @@ namespace Intellivision.CPU
 
         #region Other Functions
 
-        public void Jump_JUMP(int returnAddressRegister, int interuptFlag, UInt16 address)
+        public void Jump_JUMP(int? returnAddressRegister, bool? interuptFlag, UInt16 address)
         {
             if (returnAddressRegister != null)
-                Registers[returnAddressRegister] = Registers[7]; // this should be the address right after the jump instruction
-            
-            // do some stuff with the interupt
-            //ff    indicates how to affect the Interrupt (I) flag in the CP1610
-            // such that:
-            //     ff == 00    indicates not to affect the Interrupt flag
-            //     ff == 01    indicates to set the Interrupt flag
-            //     ff == 10    indicates to clear the Interrupt flag
-            //     ff == 11    unknown opcode (behavior unknown!!)
+                Registers[returnAddressRegister.Value] = Registers[7]; // this should be the address right after the jump instruction
+
+            if (interuptFlag != null)
+                Flags.InterruptEnable = interuptFlag.Value;
 
             Registers[7] = (ushort)(address - 1); // minus one so the first command at the address will be executed
 
-            // set auto increment registers
+            if(returnAddressRegister != null)
+                IncrementRegisterForIndirectMode(returnAddressRegister.Value);
         }
 
 
