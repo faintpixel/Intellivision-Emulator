@@ -20,5 +20,32 @@ namespace Intellivision.Tests.CPU
             Memory = new MemoryMap();
             Cpu = new CP1610(ref Memory);
         }
+
+        [Test]
+        public void MoveOutIndirect_ShouldPerformOperation()
+        {
+            Cpu.Registers[5] = 0x102B;
+            Cpu.Registers[6] = 0x02f1;
+            Cpu.MoveOutIndirect_MVOat(5, 6);
+
+            UInt16 value = Memory.Read16BitsFromAddress(0x02f1);
+            Assert.AreEqual(0x102B, value);
+            Assert.AreEqual(0x102B, Cpu.Registers[5], "Expected 0x102B was 0x" + Cpu.Registers[5].ToString("X"));
+            Assert.AreEqual(0x02f2, Cpu.Registers[6], "Expected 0x02F2 was 0x" + Cpu.Registers[6].ToString("X"));
+        }
+
+        [Test]
+        public void MoveOutIndirect_ShouldPerformOperation2()
+        {
+            Cpu.Registers[4] = 0x01F0;
+            Cpu.Registers[5] = 0x0;
+            Cpu.MoveOutIndirect_MVOat(5, 4);
+
+            UInt16 value = Memory.Read16BitsFromAddress(0x01F0);
+            Assert.AreEqual(0x0, value);
+            Assert.AreEqual(0x0, Cpu.Registers[5], "Expected 0x0 was 0x" + Cpu.Registers[5].ToString("X"));
+            Assert.AreEqual(0x01F1, Cpu.Registers[4], "Expected 0x01F1 was 0x" + Cpu.Registers[4].ToString("X"));
+        }
+
     }
 }

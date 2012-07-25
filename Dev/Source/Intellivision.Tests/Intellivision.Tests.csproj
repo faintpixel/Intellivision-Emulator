@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="CPU\CP1610Tests.cs" />
     <Compile Include="CPU\DirectAddressingModeFunctions.cs" />
+    <Compile Include="CPU\ImmediateAddressingModeFunctions.cs" />
     <Compile Include="CPU\ImpliedAddressingModeFunctions.cs" />
     <Compile Include="CPU\IndirectAddressingModeFunctions.cs" />
     <Compile Include="CPU\RegisterAddressingModeFunctions.cs" />

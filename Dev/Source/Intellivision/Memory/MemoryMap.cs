@@ -15,7 +15,7 @@ namespace Intellivision.Memory
 
         public void Write16BitsToAddress(UInt16 address, UInt16 value)
         {
-            Console.WriteLine("\nWR a=0x" + address.ToString("X") + " v=0x" + value.ToString("X"));
+            Console.WriteLine("   WR a=0x" + address.ToString("X") + " v=0x" + value.ToString("X"));
 
             int nothing = 0;
 
@@ -58,7 +58,7 @@ namespace Intellivision.Memory
             else
                 returnValue = UInt16.MaxValue;
 
-            Console.WriteLine("\nRD a=0x" + address.ToString("X") + " v=0x" + returnValue.ToString("X"));
+            Console.WriteLine("   RD a=0x" + address.ToString("X") + " v=0x" + returnValue.ToString("X"));
 
             return returnValue;
         }

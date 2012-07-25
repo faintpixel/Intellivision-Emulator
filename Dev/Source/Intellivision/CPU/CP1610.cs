@@ -71,7 +71,7 @@ namespace Intellivision.CPU
 
             //Console.WriteLine("Found command 0x" + command.ToString("X")  + " at address 0x" + commandAddress.ToString("X"));
 
-            Console.Write("0x" + command.ToString("x") + " - ");
+            //Console.Write("0x" + command.ToString("x") + " - ");
 
             if (command == 0x0000)
             {
@@ -285,7 +285,103 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0200 && command <= 0x023F)
             {
-                throw new NotImplementedException("Branch not implemented");
+                UInt16 offset = _memoryMap.Read16BitsFromAddress((ushort)(Registers[7] + 1));
+                UInt16 direction = GetNumberFromBits(command, 5, 1);
+                bool branchForward = direction == 0;
+
+                UInt16 address;
+
+                if (branchForward)
+                    address = (ushort)(Registers[7] + offset);
+                else
+                    address = (ushort)(Registers[7] - offset);
+
+                if (command == 0x0200 || command == 0x0220)
+                {
+                    Log("B $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_B(address);
+                }
+                else if (command == 0x0201 || command == 0x0221)
+                {
+                    Log("BC $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BC(address);
+                }
+                else if (command == 0x0202 || command == 0x0222)
+                {
+                    Log("BOV $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BOV(address);
+                }
+                else if (command == 0x0203 || command == 0x0223)
+                {
+                    Log("BPL $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BPL(address);
+                }
+                else if (command == 0x0204 || command == 0x0224) // this is wrong in the wiki
+                {
+                    Log("BEQ $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BEQ(address);
+                }
+                else if (command == 0x0205 || command == 0x0225)
+                {
+                    Log("BLT $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BLT(address);
+                }
+                else if (command == 0x0206 || command == 0x0226)
+                {
+                    Log("BLE $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BLE(address);
+                }
+                else if (command == 0x0207 || command == 0x0227)
+                {
+                    Log("BUSC $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BUSC(address);
+                }
+                else if (command == 0x0208 || command == 0x0228)
+                {
+                    Log("NOPP $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_NOPP(address);
+                }
+                else if (command == 0x0209 || command == 0x0229)
+                {
+                    Log("BNC $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BNC(address);
+                }
+                else if (command == 0x020A || command == 0x022A)
+                {
+                    Log("BNOV $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BNOV(address);
+                }
+                else if (command == 0x020B || command == 0x022B)
+                {
+                    Log("BMI $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BMI(address);
+                }
+                else if (command == 0x020C || command == 0x022C)
+                {
+                    Log("BNEQ $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BNEQ(address);
+                }
+                else if (command == 0x020D || command == 0x022D)
+                {
+                    Log("BGE $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BGE(address);
+                }
+                else if (command == 0x020E || command == 0x022E)
+                {
+                    Log("BGT $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BGT(address);
+                }
+                else if (command == 0x020F || command == 0x022F)
+                {
+                    Log("BESC $0x" + address.ToString("X"), LogType.CommandExecution);
+                    Branch_BESC(address);
+                }
+                else if ((command >= 0x0210 && command <= 0x021F) || (command >= 0x0230 && command <= 0x023F))
+                {
+                    throw new NotImplementedException("BEXT not implemented");
+                }
+                else
+                    throw new NotImplementedException("No idea what this is");
             }
             else if (command >= 0x0240 && command <= 0x0247)
             {
@@ -1009,6 +1105,179 @@ namespace Intellivision.CPU
 
         #region Indirect Addressing Mode Functions
 
+        public void Branch_B(UInt16 address)
+        {
+            Registers[7] = address;
+            Cycles += 9;
+        }
+
+        public void Branch_BC(UInt16 address)
+        {
+            if (Flags.Carry)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BOV(UInt16 address)
+        {
+            if (Flags.Overflow)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BPL(UInt16 address)
+        {
+            if (Flags.Sign == false)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BEQ(UInt16 address)
+        {
+            if (Flags.Zero)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BLT(UInt16 address)
+        {
+            if (Flags.Sign != Flags.Overflow)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BLE(UInt16 address)
+        {
+            if (Flags.Zero || Flags.Sign != Flags.Overflow)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BUSC(UInt16 address)
+        {
+            if (Flags.Carry != Flags.Sign)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_NOPP(UInt16 address)
+        {
+            Registers[7] += 1; // skip over the address
+            Cycles += 7;
+        }
+
+        public void Branch_BNC(UInt16 address)
+        {
+            if (Flags.Carry == false)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BNOV(UInt16 address)
+        {
+            if (Flags.Overflow == false)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BMI(UInt16 address)
+        {
+            if (Flags.Sign)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BNEQ(UInt16 address)
+        {
+            if (Flags.Zero == false)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BGE(UInt16 address)
+        {
+            if (Flags.Sign == Flags.Overflow)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BGT(UInt16 address)
+        {
+            if (Flags.Zero && Flags.Sign == Flags.Overflow)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BESC(UInt16 address)
+        {
+            if (Flags.Carry == Flags.Sign)
+            {
+                Registers[7] = address;
+                Cycles += 9;
+            }
+            else
+                Cycles += 7;
+        }
+
+        public void Branch_BEXT(UInt16 address, UInt16 pinValue)
+        {
+            // something funky about pins
+            // From the wiki: This instruction causes the CP1610 to branch if the external pins EBCA0-EBCA3 match the specified value. If this condition is true, the CP1610 branches to the address specified by the following parameters.
+            throw new NotImplementedException("BEXT not implemented");
+        }
+
         public void Jump_JUMP(int? returnAddressRegister, bool? interuptFlag, UInt16 address)
         {
             if (returnAddressRegister != null)
@@ -1049,16 +1318,7 @@ namespace Intellivision.CPU
 
         public void MoveInImmediate_MVII(int destinationRegister, UInt16 value)
         {
-            // Q - Does MVI@ set the zero/sign flag like INCR?
-            // Q - MVI@ uses 2 registers... if I use R4 for one and R5 for the other, do they both increment?
-            // The answers to the above questions will affect all other indirect methods as well..
-
-            if (destinationRegister == 6)
-                Registers[6] -= 1;
-
             Registers[destinationRegister] = value;
-
-            IncrementRegisterForIndirectMode(destinationRegister);   
         }
 
         private void IncrementRegistersForIndirectMode(int writeRegister, int readRegister)
@@ -1077,6 +1337,19 @@ namespace Intellivision.CPU
                 Registers[register] += 1;
         }
 
+        private void SetRegistersFollowingIndirectModeAccess(List<int> readFrom, List<int> wroteTo)
+        {
+            foreach (int register in wroteTo)
+                if (register == 4 || register == 5 || register == 7)
+                    Registers[register] += 1;
+                else if (register == 6)
+                    Registers[register] -= 1;
+
+            foreach (int register in readFrom)
+                if (register >= 4)
+                    Registers[register] += 1;
+        }
+
         public void MoveOutIndirect_MVOat(int sourceRegister, int destinationAddressRegister)
         {
             // Q - For MVO@, assuming that DoubleByteData flag makes it either write 8bits of 16
@@ -1090,7 +1363,7 @@ namespace Intellivision.CPU
             else
                 _memoryMap.Write16BitsToAddress(address, value); // should be 16
 
-            IncrementRegistersForIndirectMode(sourceRegister, destinationAddressRegister);    
+            SetRegistersFollowingIndirectModeAccess(new List<int> { destinationAddressRegister }, new List<int> {  });
         }
 
         public void AddIndirect_ADDat()
@@ -1156,7 +1429,7 @@ namespace Intellivision.CPU
 
             Flags.DEBUG_PRINT();
 
-            Console.Write(" " + Cycles.ToString().PadRight(5, ' ') + " ");
+            Console.WriteLine(" " + Cycles.ToString().PadRight(5, ' ') + " ");
         }
 
         //private void ReverseBitArray(ref BitArray array)
