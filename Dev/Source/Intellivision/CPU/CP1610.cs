@@ -935,12 +935,14 @@ namespace Intellivision.CPU
             else
                 Flags.Carry = false;
 
+            Cycles += 6;
+
             return result;
         }
 
         public void SubtractRegisters_SUBR(int sourceRegister, int destinationRegister)
         {
-            Registers[destinationRegister] = PerformSubtractAndSetFlags(Registers[sourceRegister], Registers[destinationRegister]);                 
+            Registers[destinationRegister] = PerformSubtractAndSetFlags(Registers[sourceRegister], Registers[destinationRegister]);
         }
 
         private UInt16 PerformSubtractAndSetFlags(UInt16 sourceValue, UInt16 destinationValue)
@@ -968,6 +970,8 @@ namespace Intellivision.CPU
             Flags.Zero = result == 0;
             Flags.Sign = resultBits[15];
 
+            Cycles += 6;
+
             return result;
         }
 
@@ -977,6 +981,8 @@ namespace Intellivision.CPU
 
             SetSignFlagFromRegister(registerNumber);
             SetZeroFlagFromRegister(registerNumber);
+
+            Cycles += 6;
         }
 
         public void DecrementRegister_DECR(int registerNumber)
@@ -985,6 +991,8 @@ namespace Intellivision.CPU
 
             SetSignFlagFromRegister(registerNumber);
             SetZeroFlagFromRegister(registerNumber);
+
+            Cycles += 6;
         }
 
         public void ComplementRegister_COMR(int registerNumber)
@@ -1004,6 +1012,7 @@ namespace Intellivision.CPU
         public void AndRegisters_ANDR(int sourceRegister, int destinationRegister)
         {
             Registers[destinationRegister] = PerformANDAndSetFlags(Registers[sourceRegister], Registers[destinationRegister]);
+            Cycles += 6;
         }
 
         private UInt16 PerformANDAndSetFlags(UInt16 sourceValue, UInt16 destinationValue)
@@ -1020,6 +1029,7 @@ namespace Intellivision.CPU
         public void XorRegisters_XORR(int sourceRegister, int destinationRegister)
         {
             Registers[destinationRegister] = PerformXorAndSetFlags(Registers[sourceRegister], Registers[destinationRegister]);
+            Cycles += 6;
         }
 
         private UInt16 PerformXorAndSetFlags(UInt16 sourceValue, UInt16 destinationValue)
@@ -1034,8 +1044,6 @@ namespace Intellivision.CPU
             return result;
         }
 
-
-
         #endregion
 
         #region Direct Addressing Mode Functions
@@ -1043,23 +1051,27 @@ namespace Intellivision.CPU
         public void MoveOut_MVO(int sourceRegister, UInt16 destinationAddress)
         {
             _memoryMap.Write16BitsToAddress(destinationAddress, Registers[sourceRegister]);
+            Cycles += 11;
         }
 
         public void MoveIn_MVI(int destinationRegister, UInt16 sourceAddress)
         {
             Registers[destinationRegister] = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            Cycles += 10;
         }
 
         public void Add_ADD(int destinationRegister, UInt16 sourceAddress)
         {
             UInt16 valueAtAddress = _memoryMap.Read16BitsFromAddress(sourceAddress);
-            Registers[destinationRegister] = PerformAddAndSetFlags(valueAtAddress, Registers[destinationRegister]); 
+            Registers[destinationRegister] = PerformAddAndSetFlags(valueAtAddress, Registers[destinationRegister]);
+            Cycles += 10;
         }
 
         public void Subtract_SUB(int destinationRegister, UInt16 sourceAddress)
         {
             UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
-            Registers[destinationRegister] = PerformSubtractAndSetFlags(sourceValue, Registers[destinationRegister]);     
+            Registers[destinationRegister] = PerformSubtractAndSetFlags(sourceValue, Registers[destinationRegister]);
+            Cycles += 10;
         }
 
         public void Compare_CMP(int destinationRegister, UInt16 sourceAddress)
@@ -1087,18 +1099,22 @@ namespace Intellivision.CPU
 
             Flags.Zero = result == 0;
             Flags.Sign = resultBits[15];
+
+            Cycles += 10;
         }
 
         public void And_AND(int destinationRegister, UInt16 sourceAddress)
         {
             UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformANDAndSetFlags(sourceValue, Registers[destinationRegister]);
+            Cycles += 10;
         }
 
         public void Xor_XOR(int destinationRegister, UInt16 sourceAddress)
         {
             UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformXorAndSetFlags(sourceValue, Registers[destinationRegister]);
+            Cycles += 10;
         }
 
         #endregion
@@ -1319,6 +1335,14 @@ namespace Intellivision.CPU
         public void MoveInImmediate_MVII(int destinationRegister, UInt16 value)
         {
             Registers[destinationRegister] = value;
+
+            if (Flags.DoubleByteData == false)
+                if (destinationRegister == 6)
+                    Cycles += 9; // according to documentation this should be 11, but jzintv seems to be doing 9
+                else
+                    Cycles += 8;
+            else    
+                Cycles += 10; 
         }
 
         private void IncrementRegistersForIndirectMode(int writeRegister, int readRegister)
@@ -1362,6 +1386,8 @@ namespace Intellivision.CPU
                 _memoryMap.Write16BitsToAddress(address, value);
             else
                 _memoryMap.Write16BitsToAddress(address, value); // should be 16
+
+            Cycles += 9;
 
             SetRegistersFollowingIndirectModeAccess(new List<int> { destinationAddressRegister }, new List<int> {  });
         }
