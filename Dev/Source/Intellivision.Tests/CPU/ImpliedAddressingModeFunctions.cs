@@ -14,13 +14,17 @@ namespace Intellivision.Tests.CPU
     {
         public CP1610 Cpu;
         public MemoryMap Memory;
+        public STIC.AY_3_8900 Stic;
+        public PSG.AY_3_891x Psg;
         private int _haltEventsRaised;
         private int _terminateCurrentInterruptEventsRaised;
 
         [SetUp]
         public void Setup()
         {
-            Memory = new MemoryMap();
+            Stic = new STIC.AY_3_8900();
+            Psg = new PSG.AY_3_891x();
+            Memory = new MemoryMap(ref Stic, ref Psg);
             Cpu = new CP1610(ref Memory);
             Cpu.Halted_HALT += new CP1610.OutputSignalEvent(Cpu_Halted_HALT);
             Cpu.TerminateCurrentInterruprt_TCI += new CP1610.OutputSignalEvent(Cpu_TerminateCurrentInterruprt_TCI);

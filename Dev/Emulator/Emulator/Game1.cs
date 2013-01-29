@@ -27,6 +27,9 @@ namespace Emulator
 
         MemoryMap memory;
         CP1610 cpu;
+        Intellivision.STIC.AY_3_8900 stic;
+        Intellivision.PSG.AY_3_891x psg;
+
         bool _programRunning = true;
 
         public Game1()
@@ -43,7 +46,9 @@ namespace Emulator
             this.Window.Title = "Awesome Intellivision Emulator v0.0.0";
             this.IsMouseVisible = true;
 
-            memory = new MemoryMap();
+            stic = new Intellivision.STIC.AY_3_8900();
+            psg = new Intellivision.PSG.AY_3_891x();
+            memory = new MemoryMap(ref stic, ref psg);
             cpu = new CP1610(ref memory);
             cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
             cpu.Log += new CP1610.LoggingEvent(cpu_Log);

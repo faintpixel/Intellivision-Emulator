@@ -11,11 +11,15 @@ namespace Intellivision.Tests.Memory
     public class MemoryMapTests
     {
         public MemoryMap memoryMap;
+        public STIC.AY_3_8900 stic;
+        public PSG.AY_3_891x psg;
 
         [SetUp]
         public void Setup()
         {
-            memoryMap = new MemoryMap();
+            stic = new STIC.AY_3_8900();
+            psg = new PSG.AY_3_891x();
+            memoryMap = new MemoryMap(ref stic, ref psg);
         }
 
         [Test]

@@ -13,11 +13,15 @@ namespace Intellivision.Tests.CPU
     {
         public MemoryMap Memory;
         public CP1610 Cpu;
+        public STIC.AY_3_8900 Stic;
+        public PSG.AY_3_891x Psg;
 
         [SetUp]
         public void Setup()
         {
-            Memory = new MemoryMap();
+            Stic = new STIC.AY_3_8900();
+            Psg = new PSG.AY_3_891x();
+            Memory = new MemoryMap(ref Stic, ref Psg);
             Cpu = new CP1610(ref Memory);
         }
 

@@ -12,6 +12,14 @@ namespace Intellivision.Memory
         private SystemRAM _systemRAM = new SystemRAM();
         private ScratchpadRAM _scratchpadRAM = new ScratchpadRAM();
         private ExecutiveROM _executiveROM = new ExecutiveROM();
+        private STIC.AY_3_8900 _stic;
+        private PSG.AY_3_891x _psg;
+
+        public MemoryMap(ref STIC.AY_3_8900 stic, ref PSG.AY_3_891x psg)
+        {
+            _stic = stic;
+            _psg = psg;
+        }
 
         public void Write16BitsToAddress(UInt16 address, UInt16 value)
         {
@@ -19,12 +27,12 @@ namespace Intellivision.Memory
 
             int nothing = 0;
 
-            if (address >= 0 && address <= 0x3F)
-                nothing = 0; // STIC REGISTERS
+            if (address >= 0 && address <= 0x7F) // note for some reason the STIC only actually uses the range from 0 to 0x3F
+                _stic.Write(address, value); // STIC REGISTERS
             else if (address >= 0x0100 && address <= 0x01EF)
                 _scratchpadRAM.Write(address - 0x100, value);
             else if (address >= 0x01F0 && address <= 0x01FF)
-                nothing = 0; // PSG REGISTERS
+                _psg.Write(address - 0x01F0, value); // not totally sure this needs to be subtracting
             else if (address >= 0x0200 && address <= 0x035F)
                 _systemRAM.Write(address - 0x0200, value);
             else if (address >= 0x1000 && address <= 0x1FFF)
@@ -41,12 +49,12 @@ namespace Intellivision.Memory
         {
             UInt16 returnValue = 0;
 
-            if (address >= 0 && address <= 0x3F)
-                returnValue = 0; // STIC REGISTERS
+            if (address >= 0 && address <= 0x7F) // note for some reason the STIC only actually uses the range from 0 to 0x3F
+                returnValue = _stic.Read(address); // STIC REGISTERS
             else if (address >= 0x0100 && address <= 0x01EF)
                 returnValue = _scratchpadRAM.Read(address - 0x0100);
             else if (address >= 0x01F0 && address <= 0x01FF)
-                returnValue = 0; // PSG REGISTERS
+                returnValue = _psg.Read(address - 0x01F0); // not totally sure this needs to be subtracting
             else if (address >= 0x0200 && address <= 0x035F)
                 returnValue = _systemRAM.Read(address - 0x0200);
             else if (address >= 0x1000 && address <= 0x1FFF)

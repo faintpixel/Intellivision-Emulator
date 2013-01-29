@@ -12,10 +12,15 @@ namespace Intellivision
     {
         static bool _programRunning = true;
         static MemoryMap memory;
+        static STIC.AY_3_8900 stic;
+        static PSG.AY_3_891x psg;
 
         static void Main(string[] args)
         {
-            memory = new MemoryMap();
+            stic = new STIC.AY_3_8900();
+            psg = new PSG.AY_3_891x();
+
+            memory = new MemoryMap(ref stic, ref psg);
             CP1610 cpu = new CP1610(ref memory);
             cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
             cpu.Log += new CP1610.LoggingEvent(cpu_Log);
