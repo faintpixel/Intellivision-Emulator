@@ -10,9 +10,11 @@ namespace Intellivision.STIC
     {
         private Color[,] _screenBuffer;
         private int _screenshotIndex;
+        private DisplayMode _displayMode;
 
         public AY_3_8900()
         {
+            _displayMode = DisplayMode.ForegroundBackground_FGBG; // no idea if this should be the default
             _screenshotIndex = 0;
             _screenBuffer = new Color[196, 89];
             ClearScreenBuffer();
@@ -61,17 +63,21 @@ namespace Intellivision.STIC
 
         public void Write(int address, UInt16 value)
         {
+            if (address == 0x21)
+                _displayMode = DisplayMode.ForegroundBackground_FGBG; // FIX: this should only apply if vblank period 1
         }
 
         public UInt16 Read(int address)
         {
+            if (address == 0x21)
+                _displayMode = DisplayMode.ColorStack; // FIX: this should only apply if vblank period 1
+
             return 0;
         }
 
-        private void UpdateDisplayMode()
+        private void ParseBackgroundTable()
         {
-            // during vblank period 1, if user writes to $21 it sets to FGBG. if they read during that period it gets set to color stack.
-
         }
+
     }
 }
