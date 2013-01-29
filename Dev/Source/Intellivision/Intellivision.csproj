@@ -53,11 +53,10 @@
     <Compile Include="Memory\RAM\GraphicsRAM.cs" />
     <Compile Include="Memory\RAM\ScratchpadRAM.cs" />
     <Compile Include="Memory\RAM\SystemRAM.cs" />
+    <Compile Include="PSG\AY_3_891x.cs" />
+    <Compile Include="STIC\AY_3_8900.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PSG\" />
-    <Folder Include="STIC\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

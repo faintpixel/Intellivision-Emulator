@@ -11,10 +11,11 @@ namespace Intellivision
     class Program
     {
         static bool _programRunning = true;
+        static MemoryMap memory;
 
         static void Main(string[] args)
         {
-            MemoryMap memory = new MemoryMap();
+            memory = new MemoryMap();
             CP1610 cpu = new CP1610(ref memory);
             cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
             cpu.Log += new CP1610.LoggingEvent(cpu_Log);
@@ -29,33 +30,13 @@ namespace Intellivision
 
             // load from file
 
-            BinaryReader reader = new BinaryReader(File.Open("system.bin", FileMode.Open));
-            int pos = 0;
-            UInt16 index = 0x1000;
+            LoadRom("system.bin", 0x1000);
+            LoadRom("hi.bin", 0x5000);
 
-            int length = (int)reader.BaseStream.Length;
-            try
-            {
-                while (pos < length)
-                {
-                    byte[] word = reader.ReadBytes(2);
-                    if (BitConverter.IsLittleEndian)
-                        Array.Reverse(word);
-
-                    UInt16 data = BitConverter.ToUInt16(word, 0);
-                    //UInt16 data = reader.ReadUInt16();
-                    Console.Write(data.ToString("X") + ":");
-                    memory.Write16BitsToAddress(index, data);
-                    pos += sizeof(UInt16);
-                    index += 1;
-                }
-            }
-            catch (Exception ex)
-            {
-            }
+            
 
             Console.WriteLine("\n");
-            Console.WriteLine("Rom loaded. Beginning execution.");
+            Console.WriteLine("Roms loaded. Beginning execution.");
             Console.WriteLine();
 
             // execute
@@ -93,6 +74,39 @@ namespace Intellivision
         static void cpu_Halted_HALT()
         {
             _programRunning = false;
+        }
+
+        static void LoadRom(string fileName, UInt16 memoryAddress)
+        {
+            BinaryReader reader = new BinaryReader(File.Open(fileName, FileMode.Open));
+            int pos = 0;
+            UInt16 index = memoryAddress;
+
+            int length = (int)reader.BaseStream.Length;
+            try
+            {
+                while (pos < length)
+                {
+                    byte[] word = reader.ReadBytes(2);
+                    if (BitConverter.IsLittleEndian)
+                        Array.Reverse(word);
+
+                    UInt16 data = BitConverter.ToUInt16(word, 0);
+                    //UInt16 data = reader.ReadUInt16();
+                    Console.Write(data.ToString("X") + ":");
+                    memory.Write16BitsToAddress(index, data);
+                    pos += sizeof(UInt16);
+                    index += 1;
+                }
+
+                Console.WriteLine("Loaded rom " + fileName + " into 0x" + memoryAddress.ToString("X"));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading rom " + fileName + " into 0x" + memoryAddress.ToString("X"));
+                Console.WriteLine(ex);
+            }
+            reader.Close();
         }
  
     }
