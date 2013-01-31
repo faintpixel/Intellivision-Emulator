@@ -1,0 +1,13 @@
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\SDL.dll
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Emulator.exe
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Emulator.pdb
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Lidgren.Network.dll
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\MonoGame.Framework.dll
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\OpenTK.dll
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Tao.Sdl.dll
+D:\github\intellivision\Dev\Source\Emulator\obj\x86\Debug\Emulator.csprojResolveAssemblyReference.cache
+D:\github\intellivision\Dev\Source\Emulator\obj\x86\Debug\Emulator.exe
+D:\github\intellivision\Dev\Source\Emulator\obj\x86\Debug\Emulator.pdb
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Emulator.exe.config
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Intellivision.exe
+D:\github\intellivision\Dev\Source\Emulator\bin\WindowsGL\Debug\Intellivision.pdb
