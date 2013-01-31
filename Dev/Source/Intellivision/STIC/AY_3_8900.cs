@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Collections;
 
 namespace Intellivision.STIC
 {
@@ -77,6 +78,41 @@ namespace Intellivision.STIC
 
         private void ParseBackgroundTable()
         {
+            if (_displayMode == DisplayMode.ForegroundBackground_FGBG)
+                ParseBackgroundTableInFGBGMode();
+            else
+                ParseBackgroundTableInColorStackMode(); 
+        }
+
+        private void ParseBackgroundTableInFGBGMode()
+        {
+            ushort backtabEntry = 7;
+
+            // do this for each backtab entry
+
+            BitArray bits = new BitArray(BitConverter.GetBytes(backtabEntry));
+
+            BitArray backgroundColorBits = new BitArray(4);
+            backgroundColorBits[0] = bits[9];
+            backgroundColorBits[1] = bits[10]; 
+            backgroundColorBits[2] = bits[12]; // note that we're skipping over index 11.
+            backgroundColorBits[3] = bits[13];
+
+            ushort cardNumber = Common.GetNumberFromBits(backtabEntry, 3, 6);
+            ushort foregroundColor = Common.GetNumberFromBits(backtabEntry, 0, 3);
+            Color backgroundColor = ConvertColor(Common.ConvertBitArrayToUInt16(backgroundColorBits));
+            bool usingGRAM = bits[11]; // 1 = GRAM, 0 = GROM
+
+            // read from either gram or grom using the card #
+            // true = foreground color
+            // false = background color
+            // set screen buffer 
+        }
+
+        private void ParseBackgroundTableInColorStackMode()
+        {
+            //http://www.atariage.com/forums/topic/176675-intellivision-tutorials/
+
         }
 
     }

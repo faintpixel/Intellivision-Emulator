@@ -97,13 +97,13 @@ namespace Intellivision.CPU
             {
                 Registers[7] += 1;
                 UInt16 command2 = _memoryMap.Read16BitsFromAddress(Registers[7]);
-                UInt16 registerId = GetNumberFromBits(command2, 8, 2);
-                UInt16 interuptFlags = GetNumberFromBits(command2, 0, 2);
-                UInt16 addressPart1 = GetNumberFromBits(command2, 2, 6);
+                UInt16 registerId = Common.GetNumberFromBits(command2, 8, 2);
+                UInt16 interuptFlags = Common.GetNumberFromBits(command2, 0, 2);
+                UInt16 addressPart1 = Common.GetNumberFromBits(command2, 2, 6);
 
                 Registers[7] += 1;
                 UInt16 command3 = _memoryMap.Read16BitsFromAddress(Registers[7]);
-                UInt16 addressPart2 = GetNumberFromBits(command3, 0, 10);
+                UInt16 addressPart2 = Common.GetNumberFromBits(command3, 0, 10);
 
                 UInt16 address = (UInt16)((addressPart1 << 10) + addressPart2);
 
@@ -144,19 +144,19 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0008 && command <= 0x000F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Log("INCR R" + register, LogType.CommandExecution);
                 IncrementRegister_INCR(register);
             }
             else if (command >= 0x0010 && command <= 0x0017)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Log("DECR R" + register, LogType.CommandExecution);
                 DecrementRegister_DECR(register);
             }
             else if (command >= 0x0018 && command <= 0x001F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Log("COMR R" + register, LogType.CommandExecution);
                 ComplementRegister_COMR(register);
             }
@@ -170,7 +170,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0030 && command <= 0x0033)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
                 Log("GSWD R" + register, LogType.CommandExecution);
                 GetStatusWord_GSWD(register);
             }
@@ -180,113 +180,113 @@ namespace Intellivision.CPU
                 throw new NotImplementedException("SIN not implemented");
             else if (command >= 0x0038 && command <= 0x003F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Log("RSWD R" + register, LogType.CommandExecution);
                 ReturnStatusWord_RSWD(register);
             }
             else if (command >= 0x0040 && command <= 0x0047)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 swapBit = GetNumberFromBits(command, 2, 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 swapBit = Common.GetNumberFromBits(command, 2, 1);
                 bool doubleSwap = swapBit == 1;
                 Log("SWAP R" + register + ", " + (swapBit + 1), LogType.CommandExecution);
                 SwapBytes_SWAP(doubleSwap, register);
             }
             else if (command >= 0x0048 && command <= 0x004F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 shiftAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("SLL R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftLogicalLeft_SLL(shiftAmount, register);
             }
             else if (command >= 0x0050 && command <= 0x0057)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 rotateAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 rotateAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("RLC R" + register + ", " + rotateAmount, LogType.CommandExecution);
                 RotateLeftThroughCarry_RLC(rotateAmount, register);
             }
             else if (command >= 0x0058 && command <= 0x005F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 shiftAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("SLLC R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftLogicalLeftThroughCarry_SLLC(shiftAmount, register);
             }
             else if (command >= 0x0060 && command <= 0x0067)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 shiftAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("SLR R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftLogicalRight_SLR(shiftAmount, register);
             }
             else if (command >= 0x0068 && command <= 0x006F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 shiftAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("SAR R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftArithmeticRight_SAR(shiftAmount, register);
             }
             else if (command >= 0x0070 && command <= 0x0077)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 rotateAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 rotateAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("RRC R" + register + ", " + rotateAmount, LogType.CommandExecution);
                 RotateRightThroughCarry_RRC(rotateAmount, register);
             }
             else if (command >= 0x0078 && command <= 0x007F)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 2);
-                UInt16 shiftAmount = (UInt16)(GetNumberFromBits(command, 2, 1) + 1);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 2);
+                UInt16 shiftAmount = (UInt16)(Common.GetNumberFromBits(command, 2, 1) + 1);
                 Log("SARC R" + register + ", " + shiftAmount, LogType.CommandExecution);
                 ShiftArtithmeticRightThroughCarry_SARC(shiftAmount, register);
             }
             else if (command >= 0x0080 && command <= 0x00BF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("MOVR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 MoveRegister_MOVR(sourceRegister, destinationRegister); 
             }
             else if (command >= 0x00C0 && command <= 0x00FF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("ADDR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 AddRegisters_ADDR(sourceRegister, destinationRegister);
             }
             else if (command >= 0x0100 && command <= 0x013F)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("SUBR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 SubtractRegisters_SUBR(sourceRegister, destinationRegister);
             }
             else if (command >= 0x0140 && command <= 0x017F)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("CMPR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 throw new NotImplementedException("CMPR not implemented");
             }
             else if (command >= 0x0180 && command <= 0x01BF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("ANDR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 AndRegisters_ANDR(sourceRegister, destinationRegister);
             }
             else if (command >= 0x01C0 && command <= 0x01FF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 sourceRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("XORR R" + sourceRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 XorRegisters_XORR(sourceRegister, destinationRegister);
             }
             else if (command >= 0x0200 && command <= 0x023F)
             {
                 UInt16 offset = _memoryMap.Read16BitsFromAddress((ushort)(Registers[7] + 1));
-                UInt16 direction = GetNumberFromBits(command, 5, 1);
+                UInt16 direction = Common.GetNumberFromBits(command, 5, 1);
                 bool branchForward = direction == 0;
 
                 UInt16 address;
@@ -385,7 +385,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0240 && command <= 0x0247)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("MVO R" + register + " \n " + address, LogType.CommandExecution);
@@ -393,20 +393,20 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0248 && command <= 0x0277) // NOTE: the intellivision wiki has the wrong end address for this
             {
-                UInt16 sourceRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 destinationAddressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 sourceRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 destinationAddressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("MVO@ R" + sourceRegister + ", R" + destinationAddressRegister, LogType.CommandExecution);
                 MoveOutIndirect_MVOat(sourceRegister, destinationAddressRegister);
             }
             else if (command >= 0x0278 && command <= 0x027F) // NOTE: The intellivision wiki has the wrong starting address for this
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Log("MVOI R" + register, LogType.CommandExecution);
                 throw new NotImplementedException("MVOI not implemented");
             }
             else if (command >= 0x0280 && command <= 0x0287)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("MVI R" + register + " \n " + address, LogType.CommandExecution);
@@ -414,14 +414,14 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0288 && command <= 0x02AF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("MVI@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 MoveInIndirect_MVIat(destinationRegister, addressRegister);
             }
             else if (command >= 0x02B0 && command <= 0x02BF)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 value = _memoryMap.Read16BitsFromAddress(Registers[7]);
 
@@ -435,7 +435,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x02C0 && command <= 0x02C7)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("ADD R" + register + " \n " + address, LogType.CommandExecution);
@@ -443,8 +443,8 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x02C8 && command <= 0x02EF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("ADD@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 AddIndirect_ADDat();
             }
@@ -454,7 +454,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0300 && command <= 0x0307)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("SUB R" + register + " \n " + address, LogType.CommandExecution);
@@ -462,8 +462,8 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0308 && command <= 0x032F)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("SUB@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 SubtractIndirect_SUBat();
             }
@@ -473,7 +473,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0340 && command <= 0x0347)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("CMP R" + register + " \n " + address, LogType.CommandExecution);
@@ -481,8 +481,8 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0348 && command <= 0x036F)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("CMP@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 CompareIndirect_CMPat();
             }
@@ -492,7 +492,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0380 && command <= 0x0387)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("AND R" + register + " \n " + address, LogType.CommandExecution);
@@ -500,8 +500,8 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0388 && command <= 0x03AF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("AND@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 AndIndirect_ANDat();
             }
@@ -511,7 +511,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x03C0 && command <= 0x03C7)
             {
-                UInt16 register = GetNumberFromBits(command, 0, 3);
+                UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
                 UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("XOR R" + register + " \n " + address, LogType.CommandExecution);
@@ -519,8 +519,8 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x03C8 && command <= 0x03EF)
             {
-                UInt16 destinationRegister = GetNumberFromBits(command, 0, 3);
-                UInt16 addressRegister = GetNumberFromBits(command, 3, 3);
+                UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
+                UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("XOR@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 XorIndirect_XORat();
             }
@@ -665,7 +665,7 @@ namespace Intellivision.CPU
             result[5] = Flags.Overflow;
             result[4] = Flags.Carry;
 
-            Registers[registerNumber] = ConvertBitArrayToUInt16(result);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(result);
         }             
 
         public void ReturnStatusWord_RSWD(int registerNumber)
@@ -712,8 +712,8 @@ namespace Intellivision.CPU
             }
 
             Flags.Sign = registerBits[7];
-            UInt16 result = ConvertBitArrayToUInt16(registerBits);
-            Registers[registerNumber] = ConvertBitArrayToUInt16(registerBits);
+            UInt16 result = Common.ConvertBitArrayToUInt16(registerBits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(registerBits);
 
             if (result == 0)
                 Flags.Zero = true;
@@ -762,7 +762,7 @@ namespace Intellivision.CPU
                 Cycles += 8;
             }
 
-            Registers[registerNumber] = ConvertBitArrayToUInt16(newBits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(newBits);
             Flags.Sign = newBits[15];
             SetZeroFlagFromRegister(registerNumber);
         }
@@ -831,7 +831,7 @@ namespace Intellivision.CPU
                 Cycles += 6;
             }
 
-            Registers[registerNumber] = ConvertBitArrayToUInt16(newBits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(newBits);
 
             SetZeroFlagFromRegister(registerNumber);
 
@@ -855,7 +855,7 @@ namespace Intellivision.CPU
 
             updatedBits[15] = originalBits[15];
 
-            Registers[registerNumber] = ConvertBitArrayToUInt16(updatedBits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(updatedBits);
             
             Flags.Carry = originalBits[0];
 
@@ -884,7 +884,7 @@ namespace Intellivision.CPU
                 updatedBits[14] = Flags.Carry;
                 Flags.Overflow = originalBits[1];
             }
-            Registers[registerNumber] = ConvertBitArrayToUInt16(updatedBits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(updatedBits);
 
             Flags.Carry = originalBits[0];
             Flags.Sign = updatedBits[7];
@@ -913,12 +913,12 @@ namespace Intellivision.CPU
         {
             UInt16 result;
 
-            BitArray originalSourceBits = ConvertUInt16ToBitArray(sourceValue);
-            BitArray originalDestinationBits = ConvertUInt16ToBitArray(destinationValue);
+            BitArray originalSourceBits = Common.ConvertUInt16ToBitArray(sourceValue);
+            BitArray originalDestinationBits = Common.ConvertUInt16ToBitArray(destinationValue);
 
             result = (UInt16)(sourceValue + destinationValue);
 
-            BitArray resultBits = ConvertUInt16ToBitArray(result);
+            BitArray resultBits = Common.ConvertUInt16ToBitArray(result);
 
             Flags.Sign = resultBits[15];
             Flags.Zero = result == 0;
@@ -949,8 +949,8 @@ namespace Intellivision.CPU
         {
             UInt16 result;
 
-            BitArray sourceBits = ConvertUInt16ToBitArray(sourceValue);
-            BitArray destinationBits = ConvertUInt16ToBitArray(destinationValue);
+            BitArray sourceBits = Common.ConvertUInt16ToBitArray(sourceValue);
+            BitArray destinationBits = Common.ConvertUInt16ToBitArray(destinationValue);
 
             if (destinationValue >= sourceValue)
                 Flags.Carry = true;
@@ -959,7 +959,7 @@ namespace Intellivision.CPU
 
             result = (UInt16)(destinationValue - sourceValue);
 
-            BitArray resultBits = ConvertUInt16ToBitArray(result);
+            BitArray resultBits = Common.ConvertUInt16ToBitArray(result);
             if (resultBits[15] == false && (sourceBits[15] == false && destinationBits[15] == true))
                 Flags.Overflow = true;
             else if (resultBits[15] == true && (sourceBits[15] == true && destinationBits[15] == false))
@@ -1003,7 +1003,7 @@ namespace Intellivision.CPU
             for (int i = 0; i < bits.Length; i++)
                 bits[i] = !bits[i];
 
-            Registers[registerNumber] = ConvertBitArrayToUInt16(bits);
+            Registers[registerNumber] = Common.ConvertBitArrayToUInt16(bits);
 
             SetZeroFlagFromRegister(registerNumber);
             SetSignFlagFromRegister(registerNumber);
@@ -1018,7 +1018,7 @@ namespace Intellivision.CPU
         private UInt16 PerformANDAndSetFlags(UInt16 sourceValue, UInt16 destinationValue)
         {
             UInt16 result = (UInt16)(sourceValue & destinationValue);
-            BitArray bits = ConvertUInt16ToBitArray(result);
+            BitArray bits = Common.ConvertUInt16ToBitArray(result);
 
             Flags.Zero = result == 0;
             Flags.Sign = bits[15];
@@ -1036,7 +1036,7 @@ namespace Intellivision.CPU
         {
             UInt16 result = (UInt16)(sourceValue ^ destinationValue);
 
-            BitArray bits = ConvertUInt16ToBitArray(result);
+            BitArray bits = Common.ConvertUInt16ToBitArray(result);
 
             Flags.Sign = bits[15];
             Flags.Zero = result == 0;
@@ -1079,8 +1079,8 @@ namespace Intellivision.CPU
             UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
             UInt16 destinationValue = Registers[destinationRegister];
 
-            BitArray sourceBits = ConvertUInt16ToBitArray(sourceValue);
-            BitArray destinationBits = ConvertUInt16ToBitArray(destinationValue);
+            BitArray sourceBits = Common.ConvertUInt16ToBitArray(sourceValue);
+            BitArray destinationBits = Common.ConvertUInt16ToBitArray(destinationValue);
 
             if (destinationValue >= sourceValue)
                 Flags.Carry = true;
@@ -1089,7 +1089,7 @@ namespace Intellivision.CPU
 
             UInt16 result = (UInt16)(destinationValue - sourceValue);
 
-            BitArray resultBits = ConvertUInt16ToBitArray(result);
+            BitArray resultBits = Common.ConvertUInt16ToBitArray(result);
             if (resultBits[15] == false && (sourceBits[15] == false && destinationBits[15] == true))
                 Flags.Overflow = true;
             else if (resultBits[15] == true && (sourceBits[15] == true && destinationBits[15] == false))
@@ -1428,17 +1428,6 @@ namespace Intellivision.CPU
             return bits;
         }
 
-        public BitArray ConvertUInt16ToBitArray(UInt16 value)
-        {            
-            byte[] bytes = BitConverter.GetBytes(value);
-
-            BitArray bits = new BitArray(bytes);
-
-            //ReverseBitArray(ref bits);
-
-            return bits;
-        }
-
         private void DEBUG_PRINT_BIT_ARRAY(BitArray bits)
         {
             foreach (bool bit in bits)
@@ -1470,34 +1459,6 @@ namespace Intellivision.CPU
         //        array[length - i - 1] = bit;
         //    }
         //}
-
-        public UInt16 GetNumberFromBits(UInt16 number, int startIndex, int length)
-        {
-            UInt16 result;
-
-            BitArray bits = ConvertUInt16ToBitArray(number);
-            BitArray bitsOfInterest = new BitArray(length);
-            int a = 0;
-            for (int i = startIndex; i < startIndex + length; i++)
-            {
-                bitsOfInterest[a] = bits[i];
-                a += 1;
-            }
-
-            result = ConvertBitArrayToUInt16(bitsOfInterest);
-
-            return result;
-        }
-
-        public UInt16 ConvertBitArrayToUInt16(BitArray bitArray)
-        {
-            Int32[] result = new Int32[1];
-
-            //ReverseBitArray(ref bitArray);
-            bitArray.CopyTo(result, 0);
-
-            return (UInt16)result[0];
-        }
 
         private void SetSignFlagFromRegister(int n)
         {

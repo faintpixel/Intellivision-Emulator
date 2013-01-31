@@ -58,7 +58,7 @@ namespace Intellivision.Tests.CPU
             bits[14] = false;
             bits[15] = false;
 
-            Assert.AreEqual(11, Cpu.ConvertBitArrayToUInt16(bits));
+            Assert.AreEqual(11, Common.ConvertBitArrayToUInt16(bits));
         }
 
     }
