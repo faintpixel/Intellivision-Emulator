@@ -11,22 +11,13 @@ namespace Intellivision
     class Program
     {
         static bool _programRunning = true;
-        static MemoryMap memory;
-        static STIC.AY_3_8900 stic;
-        static PSG.AY_3_891x psg;
 
         static void Main(string[] args)
         {
-            stic = new STIC.AY_3_8900();
-            psg = new PSG.AY_3_891x();
+            MasterComponent.Instance.Start();
 
-            memory = new MemoryMap(ref stic, ref psg);
-            CP1610 cpu = new CP1610(ref memory);
-            cpu.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
-            cpu.Log += new CP1610.LoggingEvent(cpu_Log);
-
-            // set the start position
-            cpu.Registers[7] = 0x1000;
+            MasterComponent.Instance.CPU.Halted_HALT += new CP1610.OutputSignalEvent(cpu_Halted_HALT);
+            MasterComponent.Instance.CPU.Log += new CP1610.LoggingEvent(cpu_Log);
 
             // load an imaginary program into memory
             //memory.Write16BitsToAddress(0x200, 0x0240);  // MVO R0 23
@@ -37,9 +28,7 @@ namespace Intellivision
 
             LoadRom("system.bin", 0x1000);
             LoadRom("hi.bin", 0x5000);
-
             
-
             Console.WriteLine("\n");
             Console.WriteLine("Roms loaded. Beginning execution.");
             Console.WriteLine();
@@ -49,8 +38,8 @@ namespace Intellivision
             {
                 try
                 {
-                    cpu.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
-                    cpu.ExecuteInstruction();
+                    MasterComponent.Instance.CPU.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
+                    MasterComponent.Instance.CPU.ExecuteInstruction();
                     //cpu.DEBUG_PRINT_REGISTERS_AS_HEX();
                     //cpu.DEBUG_PRINT_FLAGS();
                     Console.Write("> ");
@@ -59,13 +48,13 @@ namespace Intellivision
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    cpu.Registers[7] += 1;
+                    MasterComponent.Instance.CPU.Registers[7] += 1;
                     Console.ReadLine();
                 }
             }
 
             Console.WriteLine("------------REGISTER VALUES-------------");
-            cpu.DEBUG_PRINT_REGISTERS_AS_INT();
+            MasterComponent.Instance.CPU.DEBUG_PRINT_REGISTERS_AS_INT();
 
             Console.Write("Done.");
             Console.ReadLine();
@@ -99,7 +88,7 @@ namespace Intellivision
                     UInt16 data = BitConverter.ToUInt16(word, 0);
                     //UInt16 data = reader.ReadUInt16();
                     Console.Write(data.ToString("X") + ":");
-                    memory.Write16BitsToAddress(index, data);
+                    MasterComponent.Instance.MemoryMap.Write16BitsToAddress(index, data);
                     pos += sizeof(UInt16);
                     index += 1;
                 }

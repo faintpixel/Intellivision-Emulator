@@ -10,6 +10,9 @@ namespace Intellivision.PSG
 
         // ref: http://wiki.intellivision.us/index.php?title=PSG  [ignore the ESC's PSG and just focus on the master one]
 
+        public AY_3_891x()
+        {
+        }
 
         public void Write(int address, UInt16 value)
         {

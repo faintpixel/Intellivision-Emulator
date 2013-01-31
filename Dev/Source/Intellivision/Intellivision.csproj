@@ -51,6 +51,7 @@
     <Compile Include="CPU\CP1610.cs" />
     <Compile Include="CPU\Flags.cs" />
     <Compile Include="CPU\LogType.cs" />
+    <Compile Include="MasterComponent.cs" />
     <Compile Include="Memory\MemoryMap.cs" />
     <Compile Include="Memory\ROM\ExecutiveROM.cs" />
     <Compile Include="Program.cs" />

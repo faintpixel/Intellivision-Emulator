@@ -9,8 +9,6 @@ namespace Intellivision.CPU
 {
     public class CP1610
     {
-        private MemoryMap _memoryMap;
-
         public Flags Flags = new Flags();
 
         public UInt16[] Registers = new UInt16[8];
@@ -55,9 +53,8 @@ namespace Intellivision.CPU
 
         private List<int> _incrementingRegisters;
 
-        public CP1610(ref MemoryMap memoryMap)
+        public CP1610()
         {
-            _memoryMap = memoryMap;
             _incrementingRegisters = new List<int>();
             _incrementingRegisters.Add(4);
             _incrementingRegisters.Add(5);
@@ -67,7 +64,7 @@ namespace Intellivision.CPU
         public void ExecuteInstruction()
         {
             UInt16 commandAddress = Registers[7];
-            UInt16 command = _memoryMap.Read16BitsFromAddress(commandAddress);
+            UInt16 command = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(commandAddress);
 
             //Console.WriteLine("Found command 0x" + command.ToString("X")  + " at address 0x" + commandAddress.ToString("X"));
 
@@ -96,13 +93,13 @@ namespace Intellivision.CPU
             else if (command == 0x0004)
             {
                 Registers[7] += 1;
-                UInt16 command2 = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 command2 = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 UInt16 registerId = Common.GetNumberFromBits(command2, 8, 2);
                 UInt16 interuptFlags = Common.GetNumberFromBits(command2, 0, 2);
                 UInt16 addressPart1 = Common.GetNumberFromBits(command2, 2, 6);
 
                 Registers[7] += 1;
-                UInt16 command3 = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 command3 = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 UInt16 addressPart2 = Common.GetNumberFromBits(command3, 0, 10);
 
                 UInt16 address = (UInt16)((addressPart1 << 10) + addressPart2);
@@ -285,7 +282,7 @@ namespace Intellivision.CPU
             }
             else if (command >= 0x0200 && command <= 0x023F)
             {
-                UInt16 offset = _memoryMap.Read16BitsFromAddress((ushort)(Registers[7] + 1));
+                UInt16 offset = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress((ushort)(Registers[7] + 1));
                 UInt16 direction = Common.GetNumberFromBits(command, 5, 1);
                 bool branchForward = direction == 0;
 
@@ -387,7 +384,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("MVO R" + register + " \n " + address, LogType.CommandExecution);
                 MoveOut_MVO(register, address);
             }
@@ -408,7 +405,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("MVI R" + register + " \n " + address, LogType.CommandExecution);
                 MoveIn_MVI(register, address);
             }
@@ -423,12 +420,12 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 value = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 value = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
 
                 if (Flags.DoubleByteData)
-                    value = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                    value = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 else
-                    value = _memoryMap.Read16BitsFromAddress(Registers[7]); // FIX - this should be 8 bits i think
+                    value = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]); // FIX - this should be 8 bits i think
 
                 Log("MVII 0x" + value.ToString("x") + ", R" + register, LogType.CommandExecution);
                 MoveInImmediate_MVII(register, value);
@@ -437,7 +434,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("ADD R" + register + " \n " + address, LogType.CommandExecution);
                 Add_ADD(register, address);
             }
@@ -456,7 +453,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("SUB R" + register + " \n " + address, LogType.CommandExecution);
                 Subtract_SUB(register, address);
             }
@@ -475,7 +472,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("CMP R" + register + " \n " + address, LogType.CommandExecution);
                 Compare_CMP(register, address);
             }
@@ -494,7 +491,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("AND R" + register + " \n " + address, LogType.CommandExecution);
                 And_AND(register, address);
             }
@@ -513,7 +510,7 @@ namespace Intellivision.CPU
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
-                UInt16 address = _memoryMap.Read16BitsFromAddress(Registers[7]);
+                UInt16 address = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(Registers[7]);
                 Log("XOR R" + register + " \n " + address, LogType.CommandExecution);
                 Xor_XOR(register, address);
             }
@@ -1050,33 +1047,33 @@ namespace Intellivision.CPU
 
         public void MoveOut_MVO(int sourceRegister, UInt16 destinationAddress)
         {
-            _memoryMap.Write16BitsToAddress(destinationAddress, Registers[sourceRegister]);
+            MasterComponent.Instance.MemoryMap.Write16BitsToAddress(destinationAddress, Registers[sourceRegister]);
             Cycles += 11;
         }
 
         public void MoveIn_MVI(int destinationRegister, UInt16 sourceAddress)
         {
-            Registers[destinationRegister] = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            Registers[destinationRegister] = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             Cycles += 10;
         }
 
         public void Add_ADD(int destinationRegister, UInt16 sourceAddress)
         {
-            UInt16 valueAtAddress = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            UInt16 valueAtAddress = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformAddAndSetFlags(valueAtAddress, Registers[destinationRegister]);
             Cycles += 10;
         }
 
         public void Subtract_SUB(int destinationRegister, UInt16 sourceAddress)
         {
-            UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            UInt16 sourceValue = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformSubtractAndSetFlags(sourceValue, Registers[destinationRegister]);
             Cycles += 10;
         }
 
         public void Compare_CMP(int destinationRegister, UInt16 sourceAddress)
         {
-            UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            UInt16 sourceValue = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             UInt16 destinationValue = Registers[destinationRegister];
 
             BitArray sourceBits = Common.ConvertUInt16ToBitArray(sourceValue);
@@ -1105,14 +1102,14 @@ namespace Intellivision.CPU
 
         public void And_AND(int destinationRegister, UInt16 sourceAddress)
         {
-            UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            UInt16 sourceValue = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformANDAndSetFlags(sourceValue, Registers[destinationRegister]);
             Cycles += 10;
         }
 
         public void Xor_XOR(int destinationRegister, UInt16 sourceAddress)
         {
-            UInt16 sourceValue = _memoryMap.Read16BitsFromAddress(sourceAddress);
+            UInt16 sourceValue = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(sourceAddress);
             Registers[destinationRegister] = PerformXorAndSetFlags(sourceValue, Registers[destinationRegister]);
             Cycles += 10;
         }
@@ -1323,9 +1320,9 @@ namespace Intellivision.CPU
             UInt16 value;
 
             if (Flags.DoubleByteData)
-                value = _memoryMap.Read16BitsFromAddress(address);
+                value = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(address);
             else
-                value = _memoryMap.Read8BitsFromAddress(address);
+                value = MasterComponent.Instance.MemoryMap.Read8BitsFromAddress(address);
 
             Registers[destinationRegister] = value;
 
@@ -1383,9 +1380,9 @@ namespace Intellivision.CPU
             UInt16 value = Registers[sourceRegister];
 
             if (Flags.DoubleByteData)
-                _memoryMap.Write16BitsToAddress(address, value);
+                MasterComponent.Instance.MemoryMap.Write16BitsToAddress(address, value);
             else
-                _memoryMap.Write16BitsToAddress(address, value); // should be 16
+                MasterComponent.Instance.MemoryMap.Write16BitsToAddress(address, value); // should be 16
 
             Cycles += 9;
 

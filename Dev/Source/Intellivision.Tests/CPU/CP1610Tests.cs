@@ -12,25 +12,16 @@ namespace Intellivision.Tests.CPU
     [TestFixture]
     public class CP1610Tests
     {
-        public CP1610 Cpu;
-        public MemoryMap Memory;
-        public STIC.AY_3_8900 Stic;
-        public PSG.AY_3_891x Psg;
-
         [SetUp]
         public void Setup()
         {
-            Stic = new STIC.AY_3_8900();
-            Psg = new PSG.AY_3_891x();
-            Memory = new MemoryMap(ref Stic, ref Psg);
-            Cpu = new CP1610(ref Memory);
         }
 
         [Test]
         public void GetRegisterBits_ShouldGetBits()
         {
-            Cpu.Registers[0] = 1;
-            BitArray bits = Cpu.GetRegisterBits(0);
+            MasterComponent.Instance.CPU.Registers[0] = 1;
+            BitArray bits = MasterComponent.Instance.CPU.GetRegisterBits(0);
             Assert.IsTrue(bits[0]);
             for (int i = 1; i < 16; i++)
                 Assert.IsFalse(bits[i]);
