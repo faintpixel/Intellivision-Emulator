@@ -12,6 +12,9 @@ namespace Intellivision.Memory
         private SystemRAM _systemRAM = new SystemRAM();
         private ScratchpadRAM _scratchpadRAM = new ScratchpadRAM();
         private ExecutiveROM _executiveROM = new ExecutiveROM();
+        private GraphicsRAM _graphicsRAM = new GraphicsRAM();
+        private GraphicsROM _graphicsROM = new GraphicsROM();
+        private Cartridge.CartridgeROM _cartridge = new Cartridge.CartridgeROM();
 
         public MemoryMap()
         {
@@ -20,8 +23,6 @@ namespace Intellivision.Memory
         public void Write16BitsToAddress(UInt16 address, UInt16 value)
         {
             Console.WriteLine("   WR a=0x" + address.ToString("X") + " v=0x" + value.ToString("X"));
-
-            int nothing = 0;
 
             if (address >= 0 && address <= 0x7F) // note for some reason the STIC only actually uses the range from 0 to 0x3F
                 MasterComponent.Instance.STIC.Write(address, value); // STIC REGISTERS
@@ -34,11 +35,11 @@ namespace Intellivision.Memory
             else if (address >= 0x1000 && address <= 0x1FFF)
                 _executiveROM.Write(address - 0x1000, value);
             else if (address >= 0x3000 && address <= 0x37FF)
-                nothing = 0; // GRAPHICS ROM
+                _graphicsROM.Write(address - 0x3000, value);
             else if (address >= 0x3800 && address <= 0x39FF)
-                nothing = 0; // GRAPHICS RAM
+                _graphicsRAM.Write(address - 0x3800, value);
             else
-                throw new Exception("Writing outside of available memory.");
+                _cartridge.Write(address - 0x3A00, value);
         }
 
         public UInt16 Read16BitsFromAddress(UInt16 address)
@@ -56,13 +57,13 @@ namespace Intellivision.Memory
             else if (address >= 0x1000 && address <= 0x1FFF)
                 returnValue = _executiveROM.Read(address - 0x1000);
             else if (address >= 0x3000 && address <= 0x37FF)
-                returnValue = 0; // GRAPHICS ROM
+                returnValue = _graphicsROM.Read(address - 0x3000);
             else if (address >= 0x3800 && address <= 0x39FF)
-                returnValue = 0; // GRAPHICS RAM
+                returnValue = _graphicsRAM.Read(address - 0x3800); 
             else
-                returnValue = UInt16.MaxValue;
+                returnValue = _cartridge.Read(address - 0x3A00); 
 
-            Console.WriteLine("   RD a=0x" + address.ToString("X") + " v=0x" + returnValue.ToString("X"));
+            Console.WriteLine("   RD a=0x" + address.ToString("X") + " v=0x" + returnValue.ToString("X") + ", " + Convert.ToString(returnValue, 2).PadLeft(8, '0'));
 
             return returnValue;
         }
@@ -76,5 +77,6 @@ namespace Intellivision.Memory
         {
             throw new NotImplementedException();
         }
+
     }
 }

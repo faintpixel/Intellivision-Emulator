@@ -8,3 +8,4 @@ D:\github\intellivision\Dev\Source\Intellivision\obj\x86\Debug\Intellivision.pdb
 D:\github\intellivision\Dev\Source\Intellivision\bin\Debug\Intellivision.exe
 D:\github\intellivision\Dev\Source\Intellivision\bin\Debug\Intellivision.pdb
 D:\github\intellivision\Dev\Source\Intellivision\bin\Debug\Intellivision.exe.config
+D:\github\intellivision\Dev\Source\Intellivision\obj\x86\Debug\Intellivision.csprojResolveAssemblyReference.cache

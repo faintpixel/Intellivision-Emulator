@@ -40,8 +40,7 @@ namespace Intellivision
                 {
                     MasterComponent.Instance.CPU.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
                     MasterComponent.Instance.CPU.ExecuteInstruction();
-                    //cpu.DEBUG_PRINT_REGISTERS_AS_HEX();
-                    //cpu.DEBUG_PRINT_FLAGS();
+
                     Console.Write("> ");
                     Console.ReadLine();
                 }
