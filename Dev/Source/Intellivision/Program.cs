@@ -33,6 +33,8 @@ namespace Intellivision
             Console.WriteLine("Roms loaded. Beginning execution.");
             Console.WriteLine();
 
+            int commandsUntilNextBreak = 1;
+
             // execute
             while (_programRunning)
             {
@@ -40,9 +42,27 @@ namespace Intellivision
                 {
                     MasterComponent.Instance.CPU.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
                     MasterComponent.Instance.CPU.ExecuteInstruction();
+                    commandsUntilNextBreak--;
 
-                    Console.Write("> ");
-                    Console.ReadLine();
+                    if (commandsUntilNextBreak == 0)
+                    {
+                        commandsUntilNextBreak++;
+                        Console.Write("> ");
+                        string input = Console.ReadLine().ToLower();
+                        string[] splitInput = input.Split(' ');
+                        if (splitInput.Count() > 0)
+                        {
+                            if (splitInput[0] == "r")
+                                if (splitInput.Count() > 1)
+                                    commandsUntilNextBreak = int.Parse(splitInput[1]);
+                                else
+                                    commandsUntilNextBreak = -1;
+                            else if (splitInput[0] == "p" && splitInput.Count() > 2)
+                                MasterComponent.Instance.MemoryMap.Write16BitsToAddress(ushort.Parse(splitInput[1]), ushort.Parse(splitInput[2]));
+                        }
+
+
+                    }
                 }
                 catch (Exception ex)
                 {

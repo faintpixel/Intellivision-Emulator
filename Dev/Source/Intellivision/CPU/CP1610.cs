@@ -291,7 +291,7 @@ namespace Intellivision.CPU
                 if (branchForward)
                     address = (ushort)(Registers[7] + offset);
                 else
-                    address = (ushort)(Registers[7] - offset);
+                    address = (ushort)(Registers[7] - offset + 1);
 
                 if (command == 0x0200 || command == 0x0220)
                 {
@@ -409,14 +409,14 @@ namespace Intellivision.CPU
                 Log("MVI R" + register + " \n " + address, LogType.CommandExecution);
                 MoveIn_MVI(register, address);
             }
-            else if (command >= 0x0288 && command <= 0x02AF)
+            else if (command >= 0x0280 && command <= 0x02B7) // there's potential overlap with this command and the next one. both can do the same thing.
             {
                 UInt16 destinationRegister = Common.GetNumberFromBits(command, 0, 3);
                 UInt16 addressRegister = Common.GetNumberFromBits(command, 3, 3);
                 Log("MVI@ R" + addressRegister + ", R" + destinationRegister, LogType.CommandExecution);
                 MoveInIndirect_MVIat(destinationRegister, addressRegister);
             }
-            else if (command >= 0x02B0 && command <= 0x02BF)
+            else if (command >= 0x02B8 && command <= 0x02BF)
             {
                 UInt16 register = Common.GetNumberFromBits(command, 0, 3);
                 Registers[7] += 1;
@@ -1128,82 +1128,103 @@ namespace Intellivision.CPU
         {
             if (Flags.Carry)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BOV(UInt16 address)
         {
             if (Flags.Overflow)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BPL(UInt16 address)
         {
             if (Flags.Sign == false)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BEQ(UInt16 address)
         {
             if (Flags.Zero)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BLT(UInt16 address)
         {
             if (Flags.Sign != Flags.Overflow)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BLE(UInt16 address)
         {
             if (Flags.Zero || Flags.Sign != Flags.Overflow)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BUSC(UInt16 address)
         {
             if (Flags.Carry != Flags.Sign)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_NOPP(UInt16 address)
         {
-            Registers[7] += 1; // skip over the address
+            Registers[7] += 1; // skip over the address.. might be double skipping
             Cycles += 7;
         }
 
@@ -1211,77 +1232,98 @@ namespace Intellivision.CPU
         {
             if (Flags.Carry == false)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BNOV(UInt16 address)
         {
             if (Flags.Overflow == false)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BMI(UInt16 address)
         {
             if (Flags.Sign)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BNEQ(UInt16 address)
         {
             if (Flags.Zero == false)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BGE(UInt16 address)
         {
             if (Flags.Sign == Flags.Overflow)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BGT(UInt16 address)
         {
             if (Flags.Zero && Flags.Sign == Flags.Overflow)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BESC(UInt16 address)
         {
             if (Flags.Carry == Flags.Sign)
             {
-                Registers[7] = address;
+                Registers[7] = (UInt16)(address - 1); // - 1 because R7 gets auto incremented after this and we want it to point here.
                 Cycles += 9;
             }
             else
+            {
+                Registers[7]++; // since we read the offset
                 Cycles += 7;
+            }
         }
 
         public void Branch_BEXT(UInt16 address, UInt16 pinValue)
