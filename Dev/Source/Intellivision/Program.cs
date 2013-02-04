@@ -43,11 +43,11 @@ namespace Intellivision
                     MasterComponent.Instance.CPU.DEBUG_PRINT_JZINTV_STYLE_DEBUG_INFO();
                     MasterComponent.Instance.CPU.ExecuteInstruction();
                     commandsUntilNextBreak--;
+                    Console.Write("> ");
 
                     if (commandsUntilNextBreak == 0)
                     {
-                        commandsUntilNextBreak++;
-                        Console.Write("> ");
+                        commandsUntilNextBreak++;                        
                         string input = Console.ReadLine().ToLower();
                         string[] splitInput = input.Split(' ');
                         if (splitInput.Count() > 0)

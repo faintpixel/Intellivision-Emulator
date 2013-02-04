@@ -73,9 +73,20 @@ namespace Intellivision.Memory
             throw new NotImplementedException();
         }
 
-        public byte Read8BitsFromAddress(UInt16 address)
+        public UInt16 ReadDoubleByteData(UInt16 address, bool incrementRead)
         {
-            throw new NotImplementedException();
+            UInt16 firstRead = Read16BitsFromAddress(address);
+            if (incrementRead)
+                address++;
+            UInt16 secondRead = Read16BitsFromAddress(address);
+
+            firstRead = (ushort)(firstRead & 0xFF);
+            secondRead = (ushort)(secondRead & 0xFF);
+            secondRead = (ushort)(secondRead << 8);
+
+            UInt16 result = (ushort)(firstRead | secondRead);
+
+            return result;
         }
 
     }

@@ -43,5 +43,36 @@ namespace Intellivision.Tests.CPU
             Assert.AreEqual(0x01F1, MasterComponent.Instance.CPU.Registers[4], "Expected 0x01F1 was 0x" + MasterComponent.Instance.CPU.Registers[4].ToString("X"));
         }
 
+        [Test]
+        public void MoveInIndirect_DoubleByteData_Autoincrement()
+        {
+            MasterComponent.Instance.CPU.Flags.DoubleByteData = true;
+            MasterComponent.Instance.CPU.Registers[4] = 0x1234;
+            MasterComponent.Instance.CPU.Registers[0] = 0;
+
+            MasterComponent.Instance.MemoryMap.Write16BitsToAddress(0x1234, 0x5512);
+            MasterComponent.Instance.MemoryMap.Write16BitsToAddress(0x1235, 0x5621);
+            MasterComponent.Instance.CPU.MoveInIndirect_MVIat(0, 4);
+
+            ushort result = MasterComponent.Instance.CPU.Registers[0];
+
+            Assert.AreEqual(0x2112, result, "0x" + result.ToString("X").PadLeft(4,'0') );
+        }
+
+        [Test]
+        public void MoveInIndirect_DoubleByteData_NoAutoincrement()
+        {
+            MasterComponent.Instance.CPU.Flags.DoubleByteData = true;
+            MasterComponent.Instance.CPU.Registers[3] = 0x1234;
+            MasterComponent.Instance.CPU.Registers[0] = 0;
+
+            MasterComponent.Instance.MemoryMap.Write16BitsToAddress(0x1234, 0x5512);
+            MasterComponent.Instance.MemoryMap.Write16BitsToAddress(0x1235, 0x5621);
+            MasterComponent.Instance.CPU.MoveInIndirect_MVIat(0, 3);
+
+            ushort result = MasterComponent.Instance.CPU.Registers[0];
+
+            Assert.AreEqual(0x1212, result, "0x" + result.ToString("X").PadLeft(3, '0'));
+        }
     }
 }

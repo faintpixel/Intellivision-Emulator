@@ -1361,10 +1361,16 @@ namespace Intellivision.CPU
             UInt16 address = Registers[addressRegister];
             UInt16 value;
 
-            if (Flags.DoubleByteData)
+            if (Flags.DoubleByteData == false)
                 value = MasterComponent.Instance.MemoryMap.Read16BitsFromAddress(address);
             else
-                value = MasterComponent.Instance.MemoryMap.Read8BitsFromAddress(address);
+            {
+                Cycles += 2;
+                bool usingIncrementingRegister = false;
+                if (addressRegister == 4 || addressRegister == 5 || addressRegister == 6 || addressRegister == 7)
+                    usingIncrementingRegister = true;
+                value = MasterComponent.Instance.MemoryMap.ReadDoubleByteData(address, usingIncrementingRegister);
+            }
 
             Registers[destinationRegister] = value;
 
